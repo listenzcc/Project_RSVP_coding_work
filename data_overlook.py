@@ -33,30 +33,40 @@ Outputs  : read_save_stuff
 -------------------------------------------------------------- '''
 print('#:', time.ctime(), 'Generating read_save_stuff starts.')
 
-read_save_stuff = {}
-
-read_save_stuff['S02'] = dict(
-    session_range=range(4, 12),
-    rawfile_path=os.path.join(root, 'rawdata',
-                              '20190326_RSVP_MEG_maxuelin',
-                              'S02_lixiangTHU_20190326_%02d.ds'),
-    report_path=os.path.join(root, 'epochs_saver',
-                             'epochs_freq_1.0_30_crop_n0.2_p1.0',
-                             'meg_epoch_S02_%02d.pdf'))
-
-read_save_stuff['S01'] = dict(
-    session_range=range(4, 11),
-    rawfile_path=os.path.join(root, 'rawdata',
-                              '20190326_RSVP_MEG_zhangchuncheng',
-                              'S02_lixiangTHU_20190326_%02d.ds'),
-    report_path=os.path.join(root, 'epochs_saver',
-                             'epochs_freq_1.0_30_crop_n0.2_p1.0',
-                             'meg_epoch_S01_%02d.pdf'))
-
 newdir = os.path.join(root, 'epochs_saver',
                       'epochs_freq_1.0_30_crop_n0.2_p1.0')
 if not os.path.exists(newdir):
     os.mkdir(newdir)
+
+read_save_stuff = {}
+
+read_save_stuff['S01_eeg'] = dict(
+    session_range=range(1, 11),
+    rawfile_path=os.path.join(root, 'rawdata',
+                              '20190402_RSVP_EEG_zhangchuncheng',
+                              'zcc%d.cnt'),
+    report_dir=os.path.join(newdir, 'EEG_S01_R%02d'))
+
+read_save_stuff['S02_eeg'] = dict(
+    session_range=range(1, 11),
+    rawfile_path=os.path.join(root, 'rawdata',
+                              '20190402_RSVP_EEG_maxuelin',
+                              'mxl%d.cnt'),
+    report_dir=os.path.join(newdir, 'EEG_S02_R%02d'))
+
+read_save_stuff['S01_meg'] = dict(
+    session_range=range(4, 11),
+    rawfile_path=os.path.join(root, 'rawdata',
+                              '20190326_RSVP_MEG_zhangchuncheng',
+                              'S01_lixiangTHU_20190326_%02d.ds'),
+    report_dir=os.path.join(newdir, 'MEG_S01_R%02d'))
+
+read_save_stuff['S02_meg'] = dict(
+    session_range=range(4, 12),
+    rawfile_path=os.path.join(root, 'rawdata',
+                              '20190326_RSVP_MEG_maxuelin',
+                              'S02_lixiangTHU_20190326_%02d.ds'),
+    report_dir=os.path.join(newdir, 'MEG_S02_R%02d'))
 
 print('#:', time.ctime(), 'Generating read_save_stuff done.')
 
@@ -65,14 +75,17 @@ print('#:', time.ctime(), 'Generating read_save_stuff done.')
 Function : For each stuff
 -------------------------------------------------------------- '''
 for stuff in read_save_stuff.values():
-    figs = []
-
-    rawfile_path = stuff['rawfile_path']
-    report_path = stuff['report_path']
 
     for session_id in stuff['session_range']:
-        print(rawfile_path % session_id)
-        print(report_path % session_id)
+        rawfile_path = stuff['rawfile_path'] % session_id
+        report_dir = stuff['report_dir'] % session_id
+
+        print(rawfile_path)
+        print(report_dir)
+        if not os.path.exists(report_dir):
+            os.mkdir(report_dir)
+
+        figs = []
 
         ''' ==============================================================
         Function : Loading rawdata
@@ -80,27 +93,25 @@ for stuff in read_save_stuff.values():
         -------------------------------------------------------------- '''
         print('#:', time.ctime(), 'Loading rawdata starts.')
 
-        raw = mne.io.read_raw_ctf(rawfile_path % session_id)
-        picks = mne.pick_types(raw.info, meg=True, ref_meg=False)
-        events = mne.find_events(raw, stim_channel='UPPT001')
+        if rawfile_path.endswith('.ds'):
+            # if is MEG data
+            raw = mne.io.read_raw_ctf(rawfile_path)
+            picks = mne.pick_types(raw.info, meg=True, ref_meg=False)
+            events = mne.find_events(raw, stim_channel='UPPT001')
+        else:
+            # if is EEG data
+            raw = mne.io.read_raw_cnt(rawfile_path,
+                                      mne.channels.read_montage(
+                                          'standard_1020'),
+                                      stim_channel='STI 014')
+            picks = mne.pick_types(raw.info, eeg=True)
+            events = mne.find_events(raw)
 
         raw.load_data()
         raw.filter(freq_l, freq_h, fir_design=fir_design)
         figs.append(raw.plot_psd(tmax=np.inf, fmax=freq_h, show=False))
 
         print('#:', time.ctime(), 'Loading rawdata done.')
-
-        ''' ==============================================================
-        Function : Computing epochs
-        Outputs  : None
-        -------------------------------------------------------------- '''
-        print('#:', time.ctime(), 'Computing epochs starts.')
-
-        epochs = mne.Epochs(raw, events, event_id=event_id, picks=picks,
-                            tmin=tmin, tmax=tmax, detrend=1, preload=True)
-        epochs.resample(200)
-
-        print('#:', time.ctime(), 'Computing epochs done.')
 
         ''' ==============================================================
         Function : Calculating ICA
@@ -113,8 +124,28 @@ for stuff in read_save_stuff.values():
 
         print('#:', time.ctime(), 'Calculating ICA done.')
 
-        with PdfPages(report_path % session_id) as pp:
+        ''' ==============================================================
+        Function : Saving results
+        Outputs  : None
+        -------------------------------------------------------------- '''
+        print('#:', time.ctime(), 'Saving results starts.')
+
+        ica.save(os.path.join(report_dir, 'raw_ica.fif'))
+
+        info = {e[0]: e[1] for e in raw.info.items()}
+        with open(os.path.join(report_dir, 'raw_info.txt'), 'w') as f:
+            for e in info.items():
+                f.write(e[0])
+                f.write(': ')
+                if e[1] is not None:
+                    f.write(str(e[1]))
+                f.write('\n')
+
+        with PdfPages(os.path.join(
+                report_dir, 'raw_ica_report.pdf')) as pp:
             for f in figs:
                 pp.savefig(f)
+
+        print('#:', time.ctime(), 'Saving results done.')
 
         plt.close('all')
