@@ -11,14 +11,12 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 ''' ==============================================================
 Function : Setting independence parameters
-Outputs  : event_id, freq_l, freq_h, tmin, tmax, fir_design,
-           ica, sfreq, figs
+Outputs  : event_id, freq_l, freq_h, fir_design, ica, sfreq, figs
 -------------------------------------------------------------- '''
 print('#:', time.ctime(), 'Setting independence parameters starts.')
 
 event_id = {'odd': 1, 'norm': 2, 'button': 3}
 freq_l, freq_h = 1, 50
-tmin, tmax = -0.2, 1.0
 fir_design = 'firwin'
 ica = mne.preprocessing.ICA(n_components=0.95, method='fastica')
 sfreq = 200
@@ -33,10 +31,10 @@ Outputs  : read_save_stuff
 -------------------------------------------------------------- '''
 print('#:', time.ctime(), 'Generating read_save_stuff starts.')
 
-newdir = os.path.join(root, 'epochs_saver',
-                      'epochs_freq_1.0_30_crop_n0.2_p1.0')
-if not os.path.exists(newdir):
-    os.mkdir(newdir)
+newdir = os.path.join(root, 'epochs_saver', 'epochs_freq_1.0_50.0')
+# Protect existing results in newdir
+assert(not os.path.exists(newdir))
+os.mkdir(newdir)
 
 read_save_stuff = {}
 
@@ -121,6 +119,8 @@ for stuff in read_save_stuff.values():
 
         ica.fit(raw, picks=picks)
         [figs.append(f) for f in ica.plot_components(show=False)]
+        [figs.append(f) for f in ica.plot_properties(
+            raw, range(ica.n_components_), show=False)]
 
         print('#:', time.ctime(), 'Calculating ICA done.')
 
