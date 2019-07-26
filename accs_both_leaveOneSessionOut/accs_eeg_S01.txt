@@ -1,0 +1,10 @@
+
+accs_eeg_S01.txt
+              precision    recall  f1-score   support
+
+         odd       0.54      0.77      0.63       393
+        norm       0.99      0.98      0.99     13607
+
+    accuracy                           0.97     14000
+   macro avg       0.77      0.87      0.81     14000
+weighted avg       0.98      0.97      0.98     14000
