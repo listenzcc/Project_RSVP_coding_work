@@ -33,6 +33,12 @@ stuff_table['S01_meg'] = dict(
         MEG_S01_R_,
         'sfreq200_cropn0.2p1.0-epo.fif'
         ),
+    denoised_epochs_path=os.path.join(
+        epochs_root,
+        epochs_freq_,
+        MEG_S01_R_,
+        'sfreq200_cropn0.2p1.0-den_epo.fif'
+        ),
     raw_ica_report_path=os.path.join(
         epochs_root,
         epochs_freq_,
@@ -74,6 +80,12 @@ stuff_table['S02_meg'] = dict(
         epochs_freq_,
         MEG_S02_R_,
         'sfreq200_cropn0.2p1.0-epo.fif'
+        ),
+    denoised_epochs_path=os.path.join(
+        epochs_root,
+        epochs_freq_,
+        MEG_S02_R_,
+        'sfreq200_cropn0.2p1.0-den_epo.fif'
         ),
     raw_ica_report_path=os.path.join(
         epochs_root,
