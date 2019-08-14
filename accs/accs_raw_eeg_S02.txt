@@ -1,0 +1,10 @@
+
+accs_raw_eeg_S02.txt
+              precision    recall  f1-score   support
+
+         odd       0.77      0.52      0.62       560
+    raw_norm       0.98      0.99      0.99     13440
+
+    accuracy                           0.97     14000
+   macro avg       0.88      0.76      0.80     14000
+weighted avg       0.97      0.97      0.97     14000

@@ -1,0 +1,10 @@
+
+accs_dirty_eeg_S01.txt
+              precision    recall  f1-score   support
+
+         odd       0.78      0.60      0.68       560
+  dirty_norm       0.98      0.99      0.99     11170
+
+    accuracy                           0.97     11730
+   macro avg       0.88      0.79      0.83     11730
+weighted avg       0.97      0.97      0.97     11730

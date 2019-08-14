@@ -1,0 +1,10 @@
+
+accs_raw_meg_S01.txt
+              precision    recall  f1-score   support
+
+         odd       0.83      0.36      0.51       392
+    raw_norm       0.97      1.00      0.99      9408
+
+    accuracy                           0.97      9800
+   macro avg       0.90      0.68      0.75      9800
+weighted avg       0.97      0.97      0.97      9800
