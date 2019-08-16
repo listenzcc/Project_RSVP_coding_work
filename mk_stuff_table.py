@@ -5,13 +5,13 @@ import os
 
 ###############################
 # Make stuff table for access MEG data
-
-raw_data_root = os.path.join('d:\\', 'RSVP_MEG_experiment', 'rawdata')
-epochs_root = os.path.join(
-    'd:\\', 'RSVP_MEG_experiment', 'epochs_saver', 'epochs_freq_1.0_50.0')
+# Freesurfer root is independence from this Project
 freesurfer_root = 'd:\\freesurfer\\subjects'
-
-epochs_freq_ = 'epochs_freq_1.0_50.0'
+# Path we save rawdata
+raw_data_root = os.path.join('d:\\', 'RSVP_MEG_experiment', 'rawdata')
+# Path we save epochs
+epochs_root = os.path.join('d:\\', 'RSVP_MEG_experiment', 'epochs_saver',
+                           'epochs_freq_1.0_50.0')
 
 event_id = {'odd': 1, 'norm': 2, 'button': 3, 'clear_norm': 4}
 
@@ -30,20 +30,21 @@ for subject_id, rawfile_id, session_range in [
          range(4, 12)],
         # EEG Subject 01
         ['EEG_S01',
-        os.path.join('20190402_RSVP_EEG_zhangchuncheng',
-                              'zcc%d.cnt'),
-        range(1, 11)],
+         os.path.join('20190402_RSVP_EEG_zhangchuncheng',
+                      'zcc%d.cnt'),
+         range(1, 11)],
         # EEG Subject 02
         ['EEG_S02',
-        os.path.join('20190402_RSVP_EEG_maxuelin',
-                              'mxl%d.cnt'),
-        range(1, 11)],
+         os.path.join('20190402_RSVP_EEG_maxuelin',
+                      'mxl%d.cnt'),
+         range(1, 11)],
 ]:
 
     working_path = os.path.join(epochs_root, '%s_R%s' %
                                 (subject_id, '%02d'))
 
     print('\n'.join(['='*80, subject_id, rawfile_id, working_path]))
+    print('-' * 80)
 
     stuff_table[subject_id] = {
         # Subject id
