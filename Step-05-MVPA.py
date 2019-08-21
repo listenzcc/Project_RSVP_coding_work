@@ -7,9 +7,6 @@ import numpy as np
 import mne
 from mne.decoding import SlidingEstimator
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-
 import pickle
 
 from sklearn import svm
@@ -17,7 +14,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import LeaveOneGroupOut
-from sklearn.metrics import classification_report, f1_score
 
 from mk_stuff_table import stuff_table
 
@@ -39,9 +35,8 @@ data_id = sys.argv[-1]
 # Else use 'MEG_S02' as fname
 if data_id not in stuff_table.keys():
     data_id = 'MEG_S02'
-pkl_path = os.path.join('results_Step-05-MVPA', data_id + '.pkl')
-if not os.path.exists(os.path.dirname(pkl_path)):
-    os.mkdir(os.path.dirname(pkl_path))
+tmp_path = 'tmp'
+pkl_path = os.path.join(tmp_path, data_id + '.pkl')
 print(pkl_path)
 
 stuff = stuff_table[data_id]
@@ -52,7 +47,7 @@ for e in stuff.items():
 # Read epochs from file
 epochs_list = []
 group_list = []
-for session_id in [4, 5]:  # stuff['session_range']:
+for session_id in [5, 7]:  # stuff['session_range']:
     epochs_path = stuff['epochs_path'] % session_id
     print(epochs_path)
     # Read epochs
@@ -98,15 +93,23 @@ raw_decoder = make_pipeline(mne.decoding.Vectorizer(), StandardScaler(), clf)
 time_decoder = SlidingEstimator(clf, n_jobs=n_jobs, scoring='f1', verbose=1)
 
 # Init time information
-n_times = len(epochs.times)
+times = epochs.times
+n_times = len(times)
 y_true = epochs.events[:, 2]
 n_samples = len(y_true)
 # Time window information
 sfreq = epochs.info['sfreq']
-w_length = int(sfreq * 0.1)
-w_step = int(sfreq * 0.05)
-w_start = np.arange(0, n_times - w_length, w_step)
-n_windows = len(w_start)
+window_info = {}
+y_pred_timewindow = {}
+for window_length in [0.1, 0.2, 0.3, 0.4]:
+    w_length = int(sfreq * window_length)
+    w_step = int(sfreq * window_length / 2)
+    w_start = np.arange(0, n_times-w_length, w_step)
+    w_time = np.empty(len(w_start))
+    for j, s in enumerate(w_start):
+        w_time[j] = (times[s] + times[s+w_length]) / 2
+    y_pred_timewindow[window_length] = np.empty([n_samples, len(w_time)])
+    window_info[window_length] = [w_start, w_length, w_time]
 
 # Predicted map
 map_pred = np.zeros(n_samples)
@@ -114,8 +117,6 @@ map_pred = np.zeros(n_samples)
 y_pred = np.empty(n_samples)
 # Prediction of time resolution decoding
 y_pred_time = np.empty([n_samples, n_times])
-# Prediction of time window decoding
-y_pred_timewindow = np.empty([n_samples, n_windows])
 
 for train_index, test_index in logo.split(y_true, y_true, groups):
     # Cross-validation across groups, groups mean different sessions
@@ -137,22 +138,25 @@ for train_index, test_index in logo.split(y_true, y_true, groups):
     # Predict
     y_pred[test_index] = raw_decoder.predict(X_test)
 
-    # Time resolution decoder
+    # Time decoder
     # Fit
     time_decoder.fit(X_train, y_train)
     # Predict
     y_pred_time[test_index] = time_decoder.predict(X_test)
 
     # Time window decoder
-    for j, start in enumerate(w_start):
-        print(start)
-        # Crop X_train and X_test
-        _X_train = X_train[:, :, start:start+w_length]
-        _X_test = X_test[:, :, start:start+w_length]
-        # Fit
-        raw_decoder.fit(_X_train, y_train)
-        # Predict
-        y_pred_timewindow[test_index, j] = raw_decoder.predict(_X_test)
+    for window_length, info in window_info.items():
+        length = info[1]
+        for j, start in enumerate(info[0]):
+            stop = start + length
+            print(start)
+            # Crop X_train and X_test
+            _X_train = X_train[:, :, start:start+w_length]
+            _X_test = X_test[:, :, start:start+w_length]
+            # Fit
+            raw_decoder.fit(_X_train, y_train)
+            y_pred_timewindow[window_length][test_index,
+                                             j] = raw_decoder.predict(_X_test)
 
     # Mark examples that are tested
     map_pred[test_index] = 1
@@ -160,8 +164,8 @@ for train_index, test_index in logo.split(y_true, y_true, groups):
     print('-' * 80)
 
 results = dict(
-    times=epochs.times,
-    window_times=epochs.times[w_start],
+    times=times,
+    window_info=window_info,
     y_true=y_true,
     y_pred=y_pred,
     y_pred_time=y_pred_time,
