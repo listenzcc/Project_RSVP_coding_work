@@ -35,6 +35,7 @@ data_id = sys.argv[-1]
 # Else use 'MEG_S02' as fname
 if data_id not in stuff_table.keys():
     data_id = 'MEG_S02'
+
 tmp_path = 'tmp'
 pkl_path = os.path.join(tmp_path, data_id + '.pkl')
 print(pkl_path)
@@ -51,7 +52,13 @@ for session_id in [5, 7]:  # stuff['session_range']:
     epochs_path = stuff['epochs_path'] % session_id
     print(epochs_path)
     # Read epochs
+    # Select one option for operation
+    # Option 1, fetch odd and clear_norm epochs
     _epochs = mne.read_epochs(epochs_path)[['odd', 'clear_norm']]
+    # Option 2, fetch odd, norm and clear_norm epochs
+    # _epochs = mne.read_epochs(epochs_path)[['odd', 'norm', 'clear_norm']]
+    # _epochs.events[_epochs.events[:, -1] == 4, -1] = 2
+
     _epochs = _epochs.crop(tmin=0.0, tmax=0.8)
 
     # !!! 'Align' epochs
@@ -173,4 +180,4 @@ results = dict(
 )
 
 with open(pkl_path, 'wb') as f:
-    pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(results, f)
