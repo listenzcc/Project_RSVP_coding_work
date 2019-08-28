@@ -77,6 +77,10 @@ for subject_id, rawfile_id, session_range in [
         'evoked_joint_report_path': os.path.join(
             working_path, 'evoked_joint_report.pdf'),
 
+        # Evoked freqs of raw-epo
+        'evoked_freq_report_path': os.path.join(
+            working_path, 'evoked_freq_report.pdf'),
+
         # Covariance fif on raw-epo
         'cov_path': os.path.join(
             working_path, 'raw-epo-cov.fif'),
