@@ -10,9 +10,9 @@ from sklearn.metrics import classification_report, f1_score
 
 
 data_ids = ['EEG_S01', 'EEG_S02', 'MEG_S01', 'MEG_S02']
-cls_names = ['lr', 'svm']
+cls_names = ['lr', 'svm', 'lr_accum', 'svm_accum']
 band_names = ['Delta']
-pdf_path = 'results.pdf'
+pdf_path = 'acc_compare.pdf'
 figs = []
 for id, cls, band in itertools.product(data_ids, cls_names, band_names):
     pkl_file_name = os.path.join(cls, id + '-' + band + '.pkl')

@@ -26,6 +26,7 @@ bands = [(0, 4, 'Delta'),
 # Setting parameters
 # Events
 event_id = {'odd': 1, 'norm': 2, 'button': 3, 'clear_norm': 4}
+
 # Time range
 tmin, tmax = 0.0, 0.8
 # n_jobs
