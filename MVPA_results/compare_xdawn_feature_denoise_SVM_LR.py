@@ -10,9 +10,16 @@ from sklearn.metrics import classification_report, f1_score
 
 
 data_ids = ['EEG_S01', 'EEG_S02', 'MEG_S01', 'MEG_S02']
-cls_names = ['lr', 'svm', 'lr_accum', 'svm_accum']
+################################################################
+# Compare f1_scores on xdawn denoise vs. feature
+#                            svm     vs. lr
+cls_names = ['xdawn_denoise_f1_svm',
+             'xdawn_denoise_f1_lr',
+             'xdawn_feature_f1_svm',
+             'xdawn_feature_f1_lr']
+# Target band: Delta, 0-4 Hz
 band_names = ['Delta']
-pdf_path = 'acc_compare.pdf'
+pdf_path = 'results.pdf'
 figs = []
 for id, cls, band in itertools.product(data_ids, cls_names, band_names):
     pkl_file_name = os.path.join(cls, id + '-' + band + '.pkl')
