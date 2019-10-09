@@ -68,7 +68,7 @@ epochs_concatenate = epochs_concatenate.filter(l_freq=l_freq, h_freq=h_freq,
 # Fit xdawn use epochs
 xdawn.fit(epochs_concatenate)
 # Apply xdawn to denoise
-epochs_denoised = xdawn.apply(epochs_concatenate, event_id=['odd'])
+epochs_denoised = xdawn.apply(epochs_concatenate, event_id=['odd'])['odd']
 
 
 def plot_evoked(epochs, name='name', figs=[]):
