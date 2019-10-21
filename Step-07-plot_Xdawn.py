@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import sys
 import mne
 from mne.time_frequency import tfr_morlet
 import numpy as np
@@ -26,7 +27,7 @@ freqs = np.logspace(*np.log10([1, 4]), num=10)
 n_cycles = freqs / 2
 # Events
 # event_id = {'odd': 1, 'norm': 2, 'button': 3, 'clear_norm': 4}
-event_id = {'odd': 1, 'clear_norm': 4}
+# event_id = {'odd': 1, 'clear_norm': 4}
 # Time range
 tmin, tmax = 0.0, 0.8
 # n_jobs
@@ -35,12 +36,17 @@ n_jobs = 8
 xdawn = mne.preprocessing.Xdawn(n_components=6, reg='diagonal_fixed')
 
 # Identify data we want
-data_id = 'MEG_S02'
+if len(sys.argv) == 2:
+    data_id = sys.argv[-1]
+else:
+    data_id = 'MEG_S02'
+print(data_id)
+
 stuff = stuff_table[data_id]
 # Check the stuff
 pprint(stuff)
 # Report path
-report_path = 'result_%s.pdf'
+report_path = '_Xdawn_plotting_%s_%%s.pdf' % data_id
 
 # Initialize empty epochs_list
 epochs_list = []
@@ -101,7 +107,7 @@ def plot_evoked(epochs, name='name', figs=[]):
 def plot_evoked_freq(epochs, name='name', figs=[]):
     print('plotting evoked on frequency domain')
     # Plot overall psd
-    f = epochs.plot_psd(fmax=50, show=False)
+    f = epochs.plot_psd(fmax=50, spatial_colors=True, average=True, show=False)
     f.set_figheight(2.5)
     f.suptitle(name)
     figs.append(f)
@@ -118,7 +124,8 @@ def plot_evoked_freq(epochs, name='name', figs=[]):
                             n_jobs=n_jobs, verbose=1)
 
     # Plot wavelet power
-    f = power.plot_joint(baseline=(-0.2, 0), mode='mean',
+    timefreqs = ((0.3, 1), (0.4, 1), (0.5, 1))
+    f = power.plot_joint(baseline=(-0.2, 0), mode='mean', timefreqs=timefreqs,
                          show=False)
     f.suptitle(name)
     figs.append(f)
