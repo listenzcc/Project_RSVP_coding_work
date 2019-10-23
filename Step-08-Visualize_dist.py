@@ -1,6 +1,7 @@
 # coding: utf-8
 # filename: Step-08-Visualize_dist.py
 
+import sys
 from scipy.spatial.distance import cdist
 import tqdm
 import mne
@@ -37,12 +38,16 @@ n_jobs = 8
 xdawn = mne.preprocessing.Xdawn(n_components=6, reg='diagonal_fixed')
 
 # Identify data we want
-data_id = 'MEG_S02'
+if len(sys.argv) == 2:
+    data_id = sys.argv[1]
+else:
+    data_id = 'MEG_S02'
+print(data_id)
 stuff = stuff_table[data_id]
 # Check the stuff
 pprint(stuff)
 # Report path
-report_path = 'result_%s.pdf'
+report_path = 'result_%s.png'
 
 # Initialize empty epochs_list
 epochs_list = []
@@ -105,4 +110,6 @@ pbar.close()
 for data, label in zip([dnn, doo, dno], ['nn', 'oo', 'no']):
     plt.plot(times, data, label=label)
 plt.legend()
+plt.title(data_id)
+plt.savefig(report_path % data_id)
 plt.show()
