@@ -14,6 +14,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 ######################
 # Setting parameters
+event_id = {'odd': 1, 'norm': 2, 'button': 3, 'clear_norm': 4}
 # Bands
 bands = [(0, 4, 'Delta'),
          (4, 8, 'Theta'),
@@ -72,44 +73,56 @@ epochs_concatenate = mne.epochs.concatenate_epochs(epochs_list)
 epochs_concatenate = epochs_concatenate.filter(l_freq=l_freq, h_freq=h_freq,
                                                n_jobs=n_jobs, verbose=2)
 
+
+def compute_dists(epochs):
+    label = epochs.events[:, -1]
+    times = epochs.times
+
+    print(epochs.get_data().shape)
+    print(label.shape, np.unique(label))
+    print(times.shape)
+
+    dnn = []
+    doo = []
+    dno = []
+    pbar = tqdm.tqdm(total=len(times))
+    for j, time in enumerate(times):
+        pbar.update(1)
+        norm = epochs['clear_norm'].get_data()[:, :, j]
+        odd = epochs['odd'].get_data()[:, :, j]
+
+        nn = cdist(norm, norm)
+        oo = cdist(odd, odd)
+        no = cdist(norm, odd)
+
+        dnn.append(np.mean(nn))
+        doo.append(np.mean(oo))
+        dno.append(np.mean(no))
+
+    pbar.close()
+
+    return dnn, doo, dno
+
+
+times = epochs_concatenate.times
 # Fit xdawn use epochs
 xdawn.fit(epochs_concatenate)
 # Apply xdawn to denoise
-epochs_denoised = xdawn.apply(epochs_concatenate, event_id=['odd'])['odd']
+epochs_denoised = xdawn.apply(epochs_concatenate.copy(),
+                              event_id=['odd'])['odd']
 
-epochs = epochs_denoised.copy()
-
-event_id = {'odd': 1, 'norm': 2, 'button': 3, 'clear_norm': 4}
-
-label = epochs.events[:, -1]
-times = epochs.times
-
-print(epochs.get_data().shape)
-print(label.shape, np.unique(label))
-print(times.shape)
-
-dnn = []
-doo = []
-dno = []
-pbar = tqdm.tqdm(total=len(times))
-for j, time in enumerate(times):
-    pbar.update(1)
-    norm = epochs['clear_norm'].get_data()[:, :, j]
-    odd = epochs['odd'].get_data()[:, :, j]
-
-    nn = cdist(norm, norm)
-    oo = cdist(odd, odd)
-    no = cdist(norm, odd)
-
-    dnn.append(np.mean(nn))
-    doo.append(np.mean(oo))
-    dno.append(np.mean(no))
-
-pbar.close()
-
+fig, axes = plt.subplots(2, 1)
+dnn, doo, dno = compute_dists(epochs_concatenate)
 for data, label in zip([dnn, doo, dno], ['nn', 'oo', 'no']):
-    plt.plot(times, data, label=label)
-plt.legend()
-plt.title(data_id)
+    axes[0].plot(times, data, label=label)
+axes[0].legend()
+axes[0].set_title(data_id)
+
+dnn, doo, dno = compute_dists(epochs_denoised)
+for data, label in zip([dnn, doo, dno], ['nn', 'oo', 'no']):
+    axes[1].plot(times, data, label=label)
+axes[1].legend()
+axes[1].set_title(data_id)
+
 plt.savefig(report_path % data_id)
 plt.show()
