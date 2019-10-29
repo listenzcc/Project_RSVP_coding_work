@@ -20,18 +20,16 @@ Pass band is set to 1.0 ~ 50.0 Hz.
 The lower edge chosen is because of ICA (see below).
 
 ## Artifacts suppressing
-Depress artifacts using [ICA](https://mne.tools/stable/generated/mne.preprocessing.ICA.html?highlight=ica#mne.preprocessing.ICA).
+Depress artifacts using [ICA](https://mne.tools/stable/generated/mne.preprocessing.ICA.html?highlight=ica#mne.preprocessing.ICA) since our data contains not ecg channel.
 >ICA is sensitive to low-frequency drifts and therefore requires the data to be high-pass filtered prior to fitting. Typically, a cutoff frequency of 1 Hz is recommended.
-
-My dataset contains not ecg channels.
 
 | Script | Description |
 |--------|-------------|
 | `Step-01-Calculate_ICA_components.py` | ICA decomposition. |
 | `Step-02-Mark_bad_ICA_components.py` | Bad components identified and components depressing.|
 
-## Epoching and evoked data
-
+# Epoching and evoked data
+Compute evoked and plot it.
 | Script | Description |
 |--------|-------------|
 | `Step-03-Save_epochs.py` | Get epochs and save them. |
@@ -42,7 +40,6 @@ We also perform [time-frequency analysis](https://mne.tools/stable/auto_examples
 
 # Source locations
 Source location steps are the right-top part of the _flow_diagram_.
-
 These analysis are performed in source domain.
 
 ## Anatomical information
@@ -62,23 +59,19 @@ Using [_mne.setup_source_space()_](https://mne.tools/stable/generated/mne.setup_
 2. Creating the source space file in fif formate. Using [_mne.write_source_spaces()_](https://mne.tools/stable/generated/mne.write_source_spaces.html#mne.write_source_spaces).
 
 >Recommended subdivisions of an icosahedron and an octahedron for the creation of source spaces. The approximate source spacing and corresponding surface area have been calculated assuming a 1000-cm2 surface area per hemisphere.  
->For example, to create the reconstruction geometry for subject='sample' with a ~5-mm spacing between the grid points, say:  
+For example, to create the reconstruction geometry for subject='sample' with a ~5-mm spacing between the grid points, say:  
 > * _`src = setup_source_space('sample', spacing='oct6')`_  
 > * _`write_source_spaces('sample-oct6-src.fif', src)`_  
 > * _`src = read_source_spaces('sample-oct6-src.fif')`_  
 > * _`mne.viz.plot_alignment('sample', surfaces='white', coord_frame='head', src=src)`_
->
 >>|spacing|Sources per hemisphere|Source spacing|Surface area per source|
 >>|:-----:|:--------------------:|:------------:|:---------------------:|
 >>|'oct5'|1026|9.9|97|
 >>|'ico4'|2562|6.2|39|
 >>|'oct6'|4098|4.9|24|
 >>|'ico5'|10242|3.1|9.8|
->
->_`src`_ is [mne.SourceSpaces](https://mne.tools/stable/generated/mne.SourceSpaces.html#mne.SourceSpaces).
->Represent a list of source space.
->Currently implemented as a list of dictionaries containing the source space information.
->
+>_`src`_ is [mne.SourceSpaces](https://mne.tools/stable/generated/mne.SourceSpaces.html#mne.SourceSpaces), represent a list of source space.
+Currently implemented as a list of dictionaries containing the source space information.
 >>| Paramaters |  |
 >>|--------|--------|  
 >>| source_spaces | A list of dictionaries containing the source space information. |  
@@ -87,11 +80,9 @@ Using [_mne.setup_source_space()_](https://mne.tools/stable/generated/mne.setup_
 ### Creating the BEM model meshes
 
 BEM is [Boundary Element Model](https://mne.tools/stable/overview/implementation.html#bem-model).
-
 BEM can be calculated using the watershed algorithm.
-> Its use in MNE environment is facilitated by the script [mne watershed_bem](https://mne.tools/stable/generated/commands.html#gen-mne-watershed-bem).  
+> Its use in MNE environment is facilitated by the script [mne watershed_bem](https://mne.tools/stable/generated/commands.html#gen-mne-watershed-bem).
 After `mne watershed_bem` has completed, the following files appear in the subject's `bem/watershed` directory:  
->
 >>| Files |     |
 >>|-------|-----|
 >>| `<subject>_brain_surface` | The brain surface triangulation. |
@@ -117,16 +108,29 @@ Using this model, the BEM solution can be computed using [mne.make_bem_solution(
 
 After the BEM is set up it is advisable to check that the BEM model meshes are correctly positioned using e.g. [mne.viz.plot_alignment()](https://mne.tools/stable/generated/mne.viz.plot_alignment.html#mne.viz.plot_alignment) or [mne.Report](https://mne.tools/stable/generated/mne.Report.html#mne.Report).
 
-# Aligning coordinate frames
+## Aligning coordinate frames
 
 The calculation of the forward solution requires knowledge of the relative location and orientation of the MEG/EEG and MRI coordinate systems (see [The head and device coordinate systems](https://mne.tools/stable/overview/implementation.html#head-device-coords)).
 
 The corregistration is stored in `-trans.fif` file.
-Use [mne.gui.coregistration()](https://mne.tools/stable/generated/mne.gui.coregistration.html#mne.gui.coregistration) to create.
-
+Use [mne.gui.coregistration()](https://mne.tools/stable/generated/mne.gui.coregistration.html#mne.gui.coregistration) or [mne coreg](https://mne.tools/stable/generated/commands.html#gen-mne-coreg) to create.
 
 > The head and device coordinate systems  
 ![HeadCS](HeadCS.png "HeadCS")  
 The MEG/EEG head coordinate system employed in the MNE software is a right-handed Cartesian coordinate system. The direction of x axis is from left to right, that of y axis to the front, and the z axis thus points up.  
 The x axis of the head coordinate system passes through the two periauricular or preauricular points digitized before acquiring the data with positive direction to the right. The y axis passes through the nasion and is normal to the x axis. The z axis points up according to the right-hand rule and is normal to the xy plane.  
 The origin of the MEG device coordinate system is device dependent. Its origin is located approximately at the center of a sphere which fits the occipital section of the MEG helmet best with x axis axis going from left to right and y axis pointing front. The z axis is, again, normal to the xy plane with positive direction up.
+
+## Computing the forward solution
+
+After the MRI-MEG/EEG alignment has been set, the forward solution, i.e., the magnetic fields and electric potentials at the measurement sensors and electrodes due to dipole sources located on the cortex, can be calculated with help of [mne.make_forward_solution()](https://mne.tools/stable/generated/mne.make_forward_solution.html#mne.make_forward_solution) as:
+
+> _`fwd = make_forward_solution(raw.info, trans, src, bem_sol)`_  
+>> | Inputs |    |
+>> |--------|----|
+>> |_`raw.info`_| Info of raw instance, raw is necessary |
+>> |_`trans`_| Path of _`-trans.fif`_ (trans file)|
+>> |_`src`_  | Path of _`src`_ (SourceSpace)|
+>> |_`bem_sol`_| Path of _`bem_sol`_ (BEM solution)|
+
+## Computing the noise-covariance matrix
