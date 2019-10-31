@@ -48,6 +48,8 @@ We also perform [time-frequency analysis](https://mne.tools/stable/auto_examples
 Source location steps are the right-top part of the _flow_diagram_.
 These analysis are performed in source domain.
 
+See [Sources_analysis_demo.py](Sources_analysis_demo.py) for detail.
+
 ## 4.1 Anatomical information
 
 Anatomical information analysis uses `Cortical surface reconstruction` with [FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/RecommendedReconstruction).
