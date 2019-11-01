@@ -146,3 +146,40 @@ After the MRI-MEG/EEG alignment has been set, the forward solution, i.e., the ma
 >> |_`bem_sol`_| Path of _`bem_sol`_ (BEM solution)|
 
 ## 4.4 Computing the noise-covariance matrix
+
+The MNE software employs an estimate of the noise-covariance matrix to weight the channels correctly in the calculations.
+The noise-covariance matrix provides information about field and potential patterns representing uninteresting noise sources of either human or environmental origin.
+
+> The noise covariance matrix can be calculated in several ways:
+>
+> * Employ the individual epochs during off-line averaging to calculate the full noise covariance matrix. This is the recommended approach for evoked responses, e.g. [using mne.compute_covariance()](https://mne.tools/stable/generated/mne.compute_covariance.html#mne.compute_covariance):  
+> `cov = mne.compute_covariance(epochs, method='auto')`
+>
+> * Employ empty room data (collected without the subject) to calculate the full noise covariance matrix. This is recommended for analyzing ongoing spontaneous activity. This can be done using [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance) as:  
+> `cov = mne.compute_raw_covariance(raw_erm)`  
+>
+> * `Employ a section of continuous raw data collected in the presence of the subject to calculate the full noise covariance matrix.` This is the recommended approach for analyzing epileptic activity. The data used for this purpose should be `free of technical artifacts and epileptic activity of interest.`  
+> The length of the data segment employed should be `at least 20 seconds`. One can also use a long `(*> 200 s)` segment of data with epileptic spikes present provided that the spikes occur infrequently and that the segment is apparently stationary with respect to background brain activity. This can also use [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance).
+
+## 4.5 Calculating the inverse operator
+
+The MNE software doesn’t calculate the inverse operator explicitly but rather `computes an SVD of a matrix composed of the noise-covariance matrix`, the result of the forward calculation, and the source covariance matrix.
+This approach has the benefit that the regularization parameter (‘SNR’) can be adjusted easily when the final source estimates or dSPMs are computed. For mathematical details of this approach, please consult [Minimum-norm estimates](https://mne.tools/stable/overview/implementation.html#minimum-norm-estimates).
+
+> This computation stage can be done by using [mne.minimum_norm.make_inverse_operator()](https://mne.tools/stable/generated/mne.minimum_norm.make_inverse_operator.html#mne.minimum_norm.make_inverse_operator) as:  
+> `inv = mne.minimum_norm.make_inverse_operator(raw.info, fwd, cov, loose=0.2)`
+
+## 4.6 Creating source estimates
+
+Once all the preprocessing steps described above have been completed.
+> The inverse operator computed can be applied to the MEG and EEG data as:  
+> `stc = mne.minimum_norm.apply_inverse(evoked, inv, lambda2=1. / 9.)`  
+> And the results can be viewed as:  
+> `stc.plot()`  
+
+## 4.7 Group analyses
+
+Group analysis is facilitated by morphing source estimates, which can be done e.g., to `subject='fsaverage'` as:
+
+> `morph = mne.compute_source_morph(stc, subject_from='sample', subject_to='fsaverage')`  
+> `stc_fsaverage = morph.apply(stc)`

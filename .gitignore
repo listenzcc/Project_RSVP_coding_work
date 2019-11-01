@@ -4,3 +4,4 @@ dir_forward_solution
 *.pdf
 *.pkl
 *.png
+settings.json
