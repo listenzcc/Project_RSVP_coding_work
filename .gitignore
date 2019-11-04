@@ -5,3 +5,4 @@ dir_forward_solution
 *.pkl
 *.png
 settings.json
+.ipynb_checkpoints

@@ -176,6 +176,7 @@ Once all the preprocessing steps described above have been completed.
 > `stc = mne.minimum_norm.apply_inverse(evoked, inv, lambda2=1. / 9.)`  
 > And the results can be viewed as:  
 > `stc.plot()`  
+> `stc` is the source estimates for all epochs. list of (SourceEstimate | VectorSourceEstimate | VolSourceEstimate).
 
 ## 4.7 Group analyses
 
