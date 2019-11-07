@@ -48,7 +48,7 @@ We also perform [time-frequency analysis](https://mne.tools/stable/auto_examples
 Source location steps are the right-top part of the _flow_diagram_.
 These analysis are performed in source domain.
 
-See [Sources_analysis_demo.py](Sources_analysis_demo.py) for detail.
+See [Sources_analysis_demos folder](Source_analysis_demos/) for detail.
 
 ## 4.1 Anatomical information
 

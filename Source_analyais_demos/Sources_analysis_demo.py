@@ -6,6 +6,7 @@ import os
 import mne
 from mayavi import mlab
 import locale
+from pprint import pprint
 
 
 # %%
@@ -13,10 +14,19 @@ import locale
 subject = 'Subject_02'  # This subject name should consistance with FreeSurfer
 spacing = 'oct6'  # 4098 sources per hemisphere
 raw_path = os.path.join('/nfs/diskstation/zccdata/RSVP_data/rawdata/20190326_RSVP_MEG_maxuelin/S02_lixiangTHU_20190326_05.ds')
-epochs_path = os.path.join('/nfs/diskstation/zccdata/RSVP_data/epochs_freq_1.0_50.0/MEG_S02_R05/raw-epo.fif')
+epochs_path = os.path.join('/nfs/diskstation/zccdata/RSVP_data/epochs_freq_1.0_50.0/MEG_S02_R%02d/raw-epo.fif')
 trans_path = os.path.join('Subject_02-trans.fif')
+freesurfer_path = os.path.join('/nfs/diskstation/zccdata/freesurfer')
+names = dict(
+    fname_aseg  = os.path.join(freesurfer_path, 'subject', subject, 'mri', 'aseg.mgz'),
+    fname_model = os.path.join('%s-5120-5120-5120-bem.fif' % subject),
+    fname_bem   = os.path.join('%s-5120-5120-5120-bem_sol.fif' % subject),
+    fname_raw   = raw_path,
+)
 
 band = (0, 4, 'Delta')
+
+pprint(names)
 
 
 # %%
@@ -48,6 +58,7 @@ else:
     model = mne.make_bem_model(subject)
     mne.write_bem_surfaces(fname, model)
 print(model)
+fname_model = fname
 
 
 # %%
@@ -59,6 +70,7 @@ else:
     bem_sol = mne.make_bem_solution(model)
     mne.write_bem_solution(fname, bem_sol)
 print(bem_sol)
+fname_bem = fname
 
 
 # %%
@@ -85,7 +97,13 @@ fwd = mne.make_forward_solution(raw.info, trans, src, bem_sol)
 # Epochs
 # Todo: Now is only read single epochs.
 #       Awaiting read several epochs and concentrate them.
-epochs = mne.read_epochs(epochs_path, verbose=False)
+epochs_list = []
+for run in [5, 6, 7, 8]:
+    epo = mne.read_epochs(epochs_path % run, verbose=False)
+    if epochs_list:
+        epo.info['dev_head_t'] = epochs_list[0].info['dev_head_t']
+    epochs_list.append(epo)
+epochs = mne.epochs.concatenate_epochs(epochs_list)
 epochs = epochs.filter(l_freq=band[0], h_freq=band[1], n_jobs=32, verbose=True)
 print(epochs.info)
 
@@ -107,7 +125,7 @@ inv_xdawn = mne.minimum_norm.make_inverse_operator(raw.info, fwd, cov_xdawn, loo
 # Plot evoked
 # evoked: the mean epochs of interest.
 # stc: The source estimates.
-evoked = epochs_xdawn['odd'].average()
+evoked = epochs_xdawn['clear_norm'].average()
 stc, resident = mne.minimum_norm.apply_inverse(evoked, inv, lambda2=0.1, return_residual=True)
 print('Evoked')
 evoked.plot(spatial_colors=True)
