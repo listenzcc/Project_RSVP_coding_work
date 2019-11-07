@@ -6,3 +6,4 @@ dir_forward_solution
 *.png
 settings.json
 .ipynb_checkpoints
+*.ipynb
