@@ -83,7 +83,8 @@ _`src`_ is [mne.SourceSpaces](https://mne.tools/stable/generated/mne.SourceSpace
 | source_spaces | A list of dictionaries containing the source space information. |  
 | info | Dictionary with information about the creation of the source space file. Has keys _‘working_dir’_ and _‘command_line’_.|
 
-A Table of different spacing types  
+A Table of different spacing types
+
 |spacing|Sources per hemisphere|Source spacing|Surface area per source|
 |:-----:|:--------------------:|:------------:|:---------------------:|
 |'oct5'|1026|9.9|97|
@@ -96,7 +97,8 @@ A Table of different spacing types
 BEM is [Boundary Element Model](https://mne.tools/stable/overview/implementation.html#bem-model).
 BEM can be calculated using the watershed algorithm.
 Its use in MNE environment is facilitated by the script [mne watershed_bem](https://mne.tools/stable/generated/commands.html#gen-mne-watershed-bem).
-After `mne watershed_bem` has completed, the following files appear in the subject's `bem/watershed` directory:  
+After `mne watershed_bem` has completed, the following files appear in the subject's `bem/watershed` directory:
+
 | Files |     |
 |-------|-----|
 | `<subject>_brain_surface` | The brain surface triangulation. |
