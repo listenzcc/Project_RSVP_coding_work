@@ -83,7 +83,7 @@ _`src`_ is [mne.SourceSpaces](https://mne.tools/stable/generated/mne.SourceSpace
 | source_spaces | A list of dictionaries containing the source space information. |  
 | info | Dictionary with information about the creation of the source space file. Has keys _‘working_dir’_ and _‘command_line’_.|
 
-A Table of different spacing types
+A Table of different spacing types  
 |spacing|Sources per hemisphere|Source spacing|Surface area per source|
 |:-----:|:--------------------:|:------------:|:---------------------:|
 |'oct5'|1026|9.9|97|
