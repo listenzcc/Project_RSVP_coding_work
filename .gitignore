@@ -4,6 +4,7 @@ dir_forward_solution
 *.pdf
 *.pkl
 *.png
+!HeadCS.png
 settings.json
 .ipynb_checkpoints
 *.ipynb

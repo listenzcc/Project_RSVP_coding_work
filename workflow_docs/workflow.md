@@ -4,7 +4,7 @@
 
 The _flow_diagram_ shows what have to be done.
 
-![Flow](flow_diagram.svg "Flow")
+<img src="flow_diagram.svg " hspace="10" height="400">
 
 [Official Documentation](https://mne.tools/stable/overview/cookbook.html#flow-diagram)
 
