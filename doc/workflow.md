@@ -36,10 +36,11 @@ Depress artifacts using [ICA](https://mne.tools/stable/generated/mne.preprocessi
 # 3 Epoching and evoked data
 
 Compute evoked and plot it.
-| Script | Description |
-|--------|-------------|
-| `Step-03-Save_epochs.py` | Get epochs and save them. |
-| `Step-04-Plot_evoked.py` | Plot evoked in time series manner. |
+
+| Script                        | Description                             |
+| ----------------------------- | --------------------------------------- |
+| `Step-03-Save_epochs.py`      | Get epochs and save them.               |
+| `Step-04-Plot_evoked.py`      | Plot evoked in time series manner.      |
 | `Step-05-Plot_evoked_freq.py` | Plot evoked in frequency domain manner. |
 
 We also perform [time-frequency analysis](https://mne.tools/stable/auto_examples/time_frequency/plot_time_frequency_simulated.html?highlight=wavelet) in Step-05, using [morlet wavelet](https://mne.tools/stable/generated/mne.time_frequency.tfr_morlet.html#mne.time_frequency.tfr_morlet).
@@ -165,11 +166,11 @@ The noise covariance matrix can be calculated in several ways:
     # Compute covariance matrix using empty room data
     cov = mne.compute_raw_covariance(raw_erm)
 
-- Employ the individual epochs during off-line averaging to calculate the full noise covariance matrix. This is the recommended approach for evoked responses, e.g. [using mne.compute_covariance()](https://mne.tools/stable/generated/mne.compute_covariance.html#mne.compute_covariance):
+-   Employ the individual epochs during off-line averaging to calculate the full noise covariance matrix. This is the recommended approach for evoked responses, e.g. [using mne.compute_covariance()](https://mne.tools/stable/generated/mne.compute_covariance.html#mne.compute_covariance):
 
-- Employ empty room data (collected without the subject) to calculate the full noise covariance matrix. This is recommended for analyzing ongoing spontaneous activity. This can be done using [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance) as:  
-  `Employ a section of continuous raw data collected in the presence of the subject to calculate the full noise covariance matrix.` This is the recommended approach for analyzing epileptic activity. The data used for this purpose should be `free of technical artifacts and epileptic activity of interest.`  
-  The length of the data segment employed should be `at least 20 seconds`. One can also use a long `(*> 200 s)` segment of data with epileptic spikes present provided that the spikes occur infrequently and that the segment is apparently stationary with respect to background brain activity. This can also use [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance).
+-   Employ empty room data (collected without the subject) to calculate the full noise covariance matrix. This is recommended for analyzing ongoing spontaneous activity. This can be done using [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance) as:  
+    `Employ a section of continuous raw data collected in the presence of the subject to calculate the full noise covariance matrix.` This is the recommended approach for analyzing epileptic activity. The data used for this purpose should be `free of technical artifacts and epileptic activity of interest.`  
+    The length of the data segment employed should be `at least 20 seconds`. One can also use a long `(*> 200 s)` segment of data with epileptic spikes present provided that the spikes occur infrequently and that the segment is apparently stationary with respect to background brain activity. This can also use [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance).
 
 ## 4.5 Calculating the inverse operator
 

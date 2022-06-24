@@ -36,10 +36,11 @@ Depress artifacts using [ICA](https://mne.tools/stable/generated/mne.preprocessi
 # 3 Epoching and evoked data
 
 Compute evoked and plot it.
-| Script | Description |
-|--------|-------------|
-| `Step-03-Save_epochs.py` | Get epochs and save them. |
-| `Step-04-Plot_evoked.py` | Plot evoked in time series manner. |
+
+| Script                        | Description                             |
+| ----------------------------- | --------------------------------------- |
+| `Step-03-Save_epochs.py`      | Get epochs and save them.               |
+| `Step-04-Plot_evoked.py`      | Plot evoked in time series manner.      |
 | `Step-05-Plot_evoked_freq.py` | Plot evoked in frequency domain manner. |
 
 We also perform [time-frequency analysis](https://mne.tools/stable/auto_examples/time_frequency/plot_time_frequency_simulated.html?highlight=wavelet) in Step-05, using [morlet wavelet](https://mne.tools/stable/generated/mne.time_frequency.tfr_morlet.html#mne.time_frequency.tfr_morlet).
