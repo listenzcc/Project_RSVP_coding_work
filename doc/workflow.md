@@ -4,7 +4,7 @@
 
 The _flow_diagram_ shows what have to be done.
 
-<img src="doc/flow_diagram.svg" hspace="10" height="400">
+<img src="flow_diagram.svg " hspace="10" height="400">
 
 [Official Documentation](https://mne.tools/stable/overview/cookbook.html#flow-diagram)
 
@@ -134,7 +134,7 @@ The calculation of the forward solution requires knowledge of the relative locat
 The corregistration is stored in `-trans.fif` file.
 Use [mne.gui.coregistration()](https://mne.tools/stable/generated/mne.gui.coregistration.html#mne.gui.coregistration) or [mne coreg](https://mne.tools/stable/generated/commands.html#gen-mne-coreg) to create.
 
-> <img src="doc/HeadCS.png" align="left" hspace="10" height="200">
+> <img src="HeadCS.png" align="left" hspace="10" height="200">
 > `The head and device coordinate systems`  
 > The MEG/EEG head coordinate system employed in the MNE software is a right-handed Cartesian coordinate system. The direction of x axis is from left to right, that of y axis to the front, and the z axis thus points up.  
 > The x axis of the head coordinate system passes through the two periauricular or preauricular points digitized before acquiring the data with positive direction to the right. The y axis passes through the nasion and is normal to the x axis. The z axis points up according to the right-hand rule and is normal to the xy plane.  
@@ -165,11 +165,11 @@ The noise covariance matrix can be calculated in several ways:
     # Compute covariance matrix using empty room data
     cov = mne.compute_raw_covariance(raw_erm)
 
--   Employ the individual epochs during off-line averaging to calculate the full noise covariance matrix. This is the recommended approach for evoked responses, e.g. [using mne.compute_covariance()](https://mne.tools/stable/generated/mne.compute_covariance.html#mne.compute_covariance):
+- Employ the individual epochs during off-line averaging to calculate the full noise covariance matrix. This is the recommended approach for evoked responses, e.g. [using mne.compute_covariance()](https://mne.tools/stable/generated/mne.compute_covariance.html#mne.compute_covariance):
 
--   Employ empty room data (collected without the subject) to calculate the full noise covariance matrix. This is recommended for analyzing ongoing spontaneous activity. This can be done using [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance) as:  
-    `Employ a section of continuous raw data collected in the presence of the subject to calculate the full noise covariance matrix.` This is the recommended approach for analyzing epileptic activity. The data used for this purpose should be `free of technical artifacts and epileptic activity of interest.`  
-    The length of the data segment employed should be `at least 20 seconds`. One can also use a long `(*> 200 s)` segment of data with epileptic spikes present provided that the spikes occur infrequently and that the segment is apparently stationary with respect to background brain activity. This can also use [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance).
+- Employ empty room data (collected without the subject) to calculate the full noise covariance matrix. This is recommended for analyzing ongoing spontaneous activity. This can be done using [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance) as:  
+  `Employ a section of continuous raw data collected in the presence of the subject to calculate the full noise covariance matrix.` This is the recommended approach for analyzing epileptic activity. The data used for this purpose should be `free of technical artifacts and epileptic activity of interest.`  
+  The length of the data segment employed should be `at least 20 seconds`. One can also use a long `(*> 200 s)` segment of data with epileptic spikes present provided that the spikes occur infrequently and that the segment is apparently stationary with respect to background brain activity. This can also use [mne.compute_raw_covariance()](https://mne.tools/stable/generated/mne.compute_raw_covariance.html#mne.compute_raw_covariance).
 
 ## 4.5 Calculating the inverse operator
 
